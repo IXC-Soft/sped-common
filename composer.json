@@ -1,13 +1,15 @@
 {
-    "name": "nfephp-org/sped-common",
+    "name": "ixc-soft/sped-common",
     "type": "library",
-    "description": "sped-common é parte do projeto NFePHP.",
+    "description": "Adaptação da IXCSoft sobre o pacote sped-common que é parte do projeto NFePHP.",
     "keywords": [
         "nfe",
         "sped",
-        "nfephp"
+        "nfephp",
+        "ixcsoft",
+        "ixc"
     ],
-    "homepage": "https://github.com/nfephp-org/sped-common",
+    "homepage": "https://www.ixcsoft.com.br",
     "license": [
         "LGPL-3.0-or-later",
         "GPL-3.0-or-later",
@@ -17,13 +19,19 @@
         {
             "name": "Roberto L. Machado",
             "email": "linux.rlm@gmail.com.br",
-            "homepage": "http://www.nfephp.org",
+            "homepage": "https://www.nfephp.org",
             "role": "Developer"
         },
         {
             "name": "Gustavo Lidani",
             "email": "lidanig0@gmail.com",
             "homepage": "https://github.com/lidani",
+            "role": "Developer"
+        },
+        {
+            "name": "Eduardo Santos",
+            "email": "eduluis.cco@gmail.com",
+            "homepage": "https://github.com/duzzk1",
             "role": "Developer"
         },
         {
@@ -50,15 +58,15 @@
     "autoload": {
         "psr-4": {
             "NFePHP\\Common\\": "src/"
-        }
-    },
-    "autoload-dev": {
-        "psr-4": {
-            "NFePHP\\Common\\Tests\\": "tests/"
         },
         "files": [
             "functions_autoload.php"
         ]
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "NFePHP\\Common\\Tests\\": "tests/"
+        }
     },
     "extra": {
         "branch-alias": {
