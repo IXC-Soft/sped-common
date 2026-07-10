@@ -19,6 +19,7 @@ use CurlHandle;
 use NFePHP\Common\Soap\SoapBase;
 use NFePHP\Common\Soap\SoapInterface;
 use NFePHP\Common\Exception\SoapException;
+use NFePHP\Common\Exception\TimeoutException;
 use NFePHP\Common\Validator;
 use NFePHP\Common\Certificate;
 
@@ -45,6 +46,7 @@ class SoapCurl extends SoapBase implements SoapInterface
      * @param \SoapHeader $soapheader
      * @return string
      * @throws \NFePHP\Common\Exception\SoapException
+     * @throws \NFePHP\Common\Exception\TimeoutException
      */
     public function send(
         $url,
@@ -129,6 +131,12 @@ class SoapCurl extends SoapBase implements SoapInterface
             );
         } catch (\Exception $e) {
             throw SoapException::unableToLoadCurl($e->getMessage());
+        }
+        if ($this->soaperror_code === CURLE_OPERATION_TIMEDOUT) {
+            throw TimeoutException::timeoutFault(
+                "Timeout na comunicação com a SEFAZ [$url]: {$this->soaperror}",
+                CURLE_OPERATION_TIMEDOUT
+            );
         }
         if ($this->soaperror != '') {
             if ((int)$this->soaperror_code == 0) {
