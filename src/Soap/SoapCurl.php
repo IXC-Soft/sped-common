@@ -20,6 +20,8 @@ use NFePHP\Common\Soap\SoapBase;
 use NFePHP\Common\Soap\SoapInterface;
 use NFePHP\Common\Exception\SoapException;
 use NFePHP\Common\Exception\TimeoutException;
+use NFePHP\Common\Exception\EmptySoapResponseException;
+use NFePHP\Common\Exception\UnexpectedHttpStatusException;
 use NFePHP\Common\Validator;
 use NFePHP\Common\Certificate;
 
@@ -47,6 +49,8 @@ class SoapCurl extends SoapBase implements SoapInterface
      * @return string
      * @throws \NFePHP\Common\Exception\SoapException
      * @throws \NFePHP\Common\Exception\TimeoutException
+     * @throws \NFePHP\Common\Exception\EmptySoapResponseException
+     * @throws \NFePHP\Common\Exception\UnexpectedHttpStatusException
      */
     public function send(
         $url,
@@ -151,10 +155,10 @@ class SoapCurl extends SoapBase implements SoapInterface
             } elseif ((int) $httpcode == 500) {
                 $httpcode = 89;
             }
-            throw SoapException::soapFault($msg, $httpcode);
+            throw UnexpectedHttpStatusException::soapFault($msg, $httpcode);
         }
         if (empty($this->responseBody)) {
-            throw SoapException::soapFault('Retorno da SEFAZ VAZIO', 99);
+            throw EmptySoapResponseException::soapFault('Retorno da SEFAZ VAZIO', 99);
         }
         if (!Validator::isXML($this->responseBody)) {
             throw SoapException::soapFault('O retorno não é um XML ' . $this->responseBody, 99);
