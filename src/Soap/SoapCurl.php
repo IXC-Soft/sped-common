@@ -20,6 +20,7 @@ use NFePHP\Common\Soap\SoapBase;
 use NFePHP\Common\Soap\SoapInterface;
 use NFePHP\Common\Exception\SoapException;
 use NFePHP\Common\Exception\TimeoutException;
+use NFePHP\Common\Exception\TransportException;
 use NFePHP\Common\Exception\EmptySoapResponseException;
 use NFePHP\Common\Exception\UnexpectedHttpStatusException;
 use NFePHP\Common\Validator;
@@ -49,6 +50,7 @@ class SoapCurl extends SoapBase implements SoapInterface
      * @return string
      * @throws \NFePHP\Common\Exception\SoapException
      * @throws \NFePHP\Common\Exception\TimeoutException
+     * @throws \NFePHP\Common\Exception\TransportException
      * @throws \NFePHP\Common\Exception\EmptySoapResponseException
      * @throws \NFePHP\Common\Exception\UnexpectedHttpStatusException
      */
@@ -140,6 +142,12 @@ class SoapCurl extends SoapBase implements SoapInterface
             throw TimeoutException::timeoutFault(
                 "Timeout na comunicação com a SEFAZ [$url]: {$this->soaperror}",
                 CURLE_OPERATION_TIMEDOUT
+            );
+        }
+        if ($this->isTransportError()) {
+            throw TransportException::transportFault(
+                "Falha no transporte para a SEFAZ [$url]: {$this->soaperror}",
+                $this->soaperror_code
             );
         }
         if ($this->soaperror != '') {
