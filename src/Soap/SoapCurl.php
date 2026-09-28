@@ -17,6 +17,10 @@ namespace NFePHP\Common\Soap;
 
 use CurlHandle;
 use NFePHP\Common\Exception\SoapException;
+use NFePHP\Common\Exception\TimeoutException;
+use NFePHP\Common\Exception\TransportException;
+use NFePHP\Common\Exception\EmptySoapResponseException;
+use NFePHP\Common\Exception\UnexpectedHttpStatusException;
 use NFePHP\Common\Validator;
 use NFePHP\Common\Certificate;
 
@@ -65,6 +69,10 @@ class SoapCurl extends SoapBase implements SoapInterface
      * @param \SoapHeader $soapheader
      * @return string
      * @throws \NFePHP\Common\Exception\SoapException
+     * @throws \NFePHP\Common\Exception\TimeoutException
+     * @throws \NFePHP\Common\Exception\TransportException
+     * @throws \NFePHP\Common\Exception\EmptySoapResponseException
+     * @throws \NFePHP\Common\Exception\UnexpectedHttpStatusException
      */
     public function send(
         $url,
@@ -169,6 +177,18 @@ class SoapCurl extends SoapBase implements SoapInterface
         } catch (\Exception $e) {
             throw SoapException::unableToLoadCurl($e->getMessage());
         }
+        if ($this->soaperror_code === CURLE_OPERATION_TIMEDOUT) {
+            throw TimeoutException::timeoutFault(
+                "Timeout na comunicação com a SEFAZ [$url]: {$this->soaperror}",
+                CURLE_OPERATION_TIMEDOUT
+            );
+        }
+        if ($this->isTransportError()) {
+            throw TransportException::transportFault(
+                "Falha no transporte para a SEFAZ [$url]: {$this->soaperror}",
+                $this->soaperror_code
+            );
+        }
         if ($this->soaperror != '') {
             if ((int)$this->soaperror_code == 0) {
                 $this->soaperror_code = 7;
@@ -182,10 +202,10 @@ class SoapCurl extends SoapBase implements SoapInterface
             } elseif ((int) $httpcode == 500) {
                 $httpcode = 89;
             }
-            throw SoapException::soapFault($msg, $httpcode);
+            throw UnexpectedHttpStatusException::soapFault($msg, $httpcode);
         }
         if (empty($this->responseBody)) {
-            throw SoapException::soapFault('Retorno da SEFAZ VAZIO', 99);
+            throw EmptySoapResponseException::soapFault('Retorno da SEFAZ VAZIO', 99);
         }
         if (!Validator::isXML($this->responseBody)) {
             throw SoapException::soapFault('O retorno não é um XML ' . $this->responseBody, 99);

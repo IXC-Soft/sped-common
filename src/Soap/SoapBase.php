@@ -248,6 +248,22 @@ abstract class SoapBase implements SoapInterface
     }
 
     /**
+     * Check if an error occurred during transmission to SEFAZ
+     * @return bool
+     */
+    protected function isTransportError(): bool
+    {
+        return in_array($this->soaperror_code, [
+            CURLE_COULDNT_RESOLVE_HOST,
+            CURLE_COULDNT_CONNECT,
+            CURLE_SSL_CONNECT_ERROR,
+            CURLE_SSL_CERTPROBLEM,
+            CURLE_SSL_CIPHER,
+            CURLE_SSL_CACERT,
+        ], true);
+    }
+
+    /**
      * Load path to CA and enable to use on SOAP
      * @param string $capath
      * @return void
